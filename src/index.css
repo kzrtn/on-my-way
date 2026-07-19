@@ -1,0 +1,20 @@
+.sigCanvas {
+  border: 1px solid #8a8a8a;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.lineItem {
+  width: 300px;
+  height: 25px;
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
+.lineItemSmall {
+  width: 50px;
+  height: 25px;
+  margin-bottom: 10px;
+  margin-right: 10px;
+  text-align: center;
+}
