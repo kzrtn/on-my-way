@@ -1,4 +1,4 @@
-function InputField({value, label, id, type, onChange}) {
+function InputField({value, id, label, type, onChange}) {
   return (
     <div>
       {label}: <input value={value} id={id} onChange={onChange} type={type} className='lineItem'></input>
