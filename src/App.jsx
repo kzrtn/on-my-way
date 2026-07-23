@@ -43,7 +43,6 @@ function App() {
         currentPage === 'EditOrder'
         ? <EditOrder
           saveOrder={saveOrder}
-          markOrderAsFulfilled={markOrderAsFulfilled}
           orderDetails={orderDetails}
           setOrderDetails={setOrderDetails}
           lineItems={lineItems}
