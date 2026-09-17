@@ -17,7 +17,6 @@ function Signature({sigCanvas, clearCanvas}) {
     <SignatureCanvas ref={sigCanvas} penColor='blue' canvasProps={{width: 400, height: 200, className: 'sigCanvas'}} />
     <div>
       <button onClick={clearCanvas} style={buttonStyle}>Clear</button>
-      {/* <button onClick={saveCanvas}>Save Signature</button> */}
     </div>
   </div>
   )
