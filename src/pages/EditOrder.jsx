@@ -13,9 +13,8 @@ function EditOrder({ orderId }) {
       orderService.get(orderId).then(res => setOrder(res))
     } else {
       orderService.getLastOrder().then(res => {
-        const newId = Number(res.doNo) + 1
         setOrder({
-          doNo: newId.toString().padStart(4, "0"),
+          doNo: (Number(res.doNo) + 1).toString(),
           status: "unfulfilled",
           deliverBy: "",
           companyName: "",
@@ -34,7 +33,9 @@ function EditOrder({ orderId }) {
           ],
           signature: {
             img: "",
-            timestamp: ""
+            timestamp: "",
+            name: "",
+            contact: ""
           },
         })
       })

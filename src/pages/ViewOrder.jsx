@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import Signature from "../components/Signature.jsx"
 import orderService from "../services/orders.js"
+import InputField from "../components/InputField.jsx"
 
 function ViewOrder({ orderId }) {
   const navigate = useNavigate()
@@ -10,21 +11,42 @@ function ViewOrder({ orderId }) {
   const [order, setOrder] = useState(null)
   useEffect(() => {
     orderService.get(orderId).then(res => setOrder(res))
-  })
+  }, [])
 
   const markOrderAsFulfilled = () => {
     const newOrder = {
       ...order,
       status: 'delivered',
       signature: {
+        ...order.signature,
         img: sigCanvas.current.toDataURL('image/png'),
-        timestamp: (new Date).toString()
+        timestamp: (new Date).toString(),
       }
     }
     orderService.update(newOrder).then(() => navigate(`/`))
   }
 
   if (!order) return null
+
+  const nameFieldChange = ({target}) => {
+    setOrder({
+      ...order,
+      signature: {
+        ...order.signature,
+        name: target.value
+      }
+    })
+  }
+
+  const contactFieldChange = ({target}) => {
+    setOrder({
+      ...order,
+      signature: {
+        ...order.signature,
+        contact: target.value
+      }
+    })
+  }
 
   return (
     <>
@@ -74,10 +96,16 @@ function ViewOrder({ orderId }) {
         order.status === 'unfulfilled'
           ? <>
               <Signature sigCanvas={sigCanvas} clearCanvas={clearCanvas}/>
+              <InputField value={order.signature.name} id="signee-name" label="Name" type="text" onChange={nameFieldChange} />
+              <InputField value={order.signature.contact} id="signee-contact" label="Contact" type="text" onChange={contactFieldChange} />
               <button onClick={markOrderAsFulfilled}
               >Mark as sent</button>
             </>
-          : <div><img src={order.signature.img}/></div>
+          : <div>
+              <img src={order.signature.img}/>
+              <div><b>Name: </b>{order.signature.name}</div>
+              <div><b>Contact: </b>{order.signature.contact}</div>
+            </div>
       }
     </>
   )
