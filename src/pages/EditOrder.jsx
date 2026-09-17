@@ -17,7 +17,7 @@ function EditOrder({ orderId }) {
         setOrder({
           doNo: newId.toString().padStart(4, "0"),
           status: "unfulfilled",
-          date: "",
+          deliverBy: "",
           companyName: "",
           deliverTo: "",
           contact: "",
@@ -57,9 +57,9 @@ function EditOrder({ orderId }) {
       <button><Link to="/">Go back to index</Link></button>
       <h1>DO No. {order.doNo}</h1>
       <InputField
-        label='Date'
-        id='date'
-        value={order.date}
+        label='Deliver By'
+        id='deliverBy'
+        value={order.deliverBy}
         type='date'
         onChange={onChange}
       />
