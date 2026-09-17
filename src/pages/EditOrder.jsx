@@ -1,72 +1,113 @@
 import InputField from "../components/InputField.jsx"
 import InputLineItems from "../components/InputLineItems.jsx"
+import orderService from "../services/orders.js"
+import { useEffect, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
 
-function EditOrder(props) {
-  const {orderDetails, setOrderDetails, lineItems, setLineItems, setCurrentPage, saveOrder} = props
-  const handleDetailsChange = e =>
-    setOrderDetails({...orderDetails, [e.target.id]: e.target.value})
+function EditOrder({ orderId }) {
+  const [order, setOrder] = useState(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (orderId) {
+      orderService.get(orderId).then(res => setOrder(res))
+    } else {
+      orderService.getLastOrder().then(res => {
+        const newId = Number(res.doNo) + 1
+        setOrder({
+          doNo: newId.toString().padStart(4, "0"),
+          status: "unfulfilled",
+          date: "",
+          companyName: "",
+          deliverTo: "",
+          contact: "",
+          attendedBy: "",
+          model: "",
+          serialNumber: "",
+          items: [
+            {
+              id: crypto.randomUUID(),
+              content: "",
+              qty: "",
+              price: ""
+            }
+          ],
+          signature: {
+            img: "",
+            timestamp: ""
+          },
+        })
+      })
+    }
+  }, [])
+  if (!order) return null
+
+  const onChange = ({target}) => setOrder({ ...order, [target.id]: target.value })
+
+  const saveOrder = () => {
+    if (orderId) {
+      orderService.update(order).then(() => navigate(`/order/${orderId}`))
+    } else {
+      orderService.create(order).then(res => navigate(`/order/${res.id}`))
+    }
+  }
 
   return (
     <>
-      <button onClick={() => setCurrentPage('index')}>Go back to index</button>
-      <h1>DO No. {orderDetails.doNo}</h1>
+      <button><Link to="/">Go back to index</Link></button>
+      <h1>DO No. {order.doNo}</h1>
       <InputField
         label='Date'
         id='date'
-        value={orderDetails.date}
+        value={order.date}
         type='date'
-        onChange={handleDetailsChange}
+        onChange={onChange}
       />
       <InputField
-      label='Company Name'
-      value={orderDetails.companyName}
-      id='companyName'
-      onChange={handleDetailsChange}
+        label='Company Name'
+        value={order.companyName}
+        id='companyName'
+        onChange={onChange}
       />
       <InputField
-      label='Deliver to'
-      value={orderDetails.deliverTo}
-      id='deliverTo'
-      onChange={handleDetailsChange}
+        label='Deliver to'
+        value={order.deliverTo}
+        id='deliverTo'
+        onChange={onChange}
       />
       <InputField
-      label='Contact'
-      value={orderDetails.contact}
-      id='contact'
-      onChange={handleDetailsChange}
+        label='Contact'
+        value={order.contact}
+        id='contact'
+        onChange={onChange}
       />
       <InputField
-      label='Attended By'
-      value={orderDetails.attendedBy}
-      id='attendedBy'
-      onChange={handleDetailsChange}
+        label='Attended By'
+        value={order.attendedBy}
+        id='attendedBy'
+        onChange={onChange}
       />
       <InputField
-      label='Model'
-      value={orderDetails.model}
-      id='model'
-      onChange={handleDetailsChange}
+        label='Model'
+        value={order.model}
+        id='model'
+        onChange={onChange}
       />
       <InputField
-      label='S/N'
-      value={orderDetails.serialNumber}
-      id='serialNumber'
-      onChange={handleDetailsChange}
+        label='S/N'
+        value={order.serialNumber}
+        id='serialNumber'
+        onChange={onChange}
       />
 
       <InputLineItems
-      lineItems={lineItems}
-      setLineItems={setLineItems}
+        order={order}
+        setOrder={setOrder}
       />
 
       <div>
-        <button
-          onClick={() => {
-            saveOrder(lineItems, orderDetails)
-            setCurrentPage('index')
-          }}
-        >
-          {orderDetails.status === 'new' ? 'Create Order' : 'Save Order'}
+        <button onClick={saveOrder}>
+          {order.status === 'new' ? 'Create Order' : 'Save Order'}
         </button>
       </div>
     </>

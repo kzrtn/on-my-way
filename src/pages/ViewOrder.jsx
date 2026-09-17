@@ -1,25 +1,44 @@
-import { useRef } from "react"
+import { useRef, useEffect, useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import Signature from "../components/Signature.jsx"
+import orderService from "../services/orders.js"
 
-function ViewOrder(props) {
-  const {orderDetails, lineItems, setCurrentPage, markOrderAsFulfilled} = props
+function ViewOrder({ orderId }) {
+  const navigate = useNavigate()
   const sigCanvas = useRef(null)
-
   const clearCanvas = () => sigCanvas.current.clear()
+  const [order, setOrder] = useState(null)
+  useEffect(() => {
+    orderService.get(orderId).then(res => setOrder(res))
+  })
+
+  const markOrderAsFulfilled = () => {
+    const newOrder = {
+      ...order,
+      status: 'delivered',
+      signature: {
+        img: sigCanvas.current.toDataURL('image/png'),
+        timestamp: (new Date).toString()
+      }
+    }
+    orderService.update(newOrder).then(() => navigate(`/`))
+  }
+
+  if (!order) return null
 
   return (
     <>
-      <button onClick={() => setCurrentPage('index')}>Go back to index</button>
-      <h1>DO No. {orderDetails.doNo}</h1>
-      <button onClick={() => setCurrentPage('EditOrder')}>Edit</button>
-      <h2>{orderDetails.companyName}</h2>
-      <div><b>Status: </b>{orderDetails.status}</div>
-      <div><b>Delivery date: </b>{orderDetails.date}</div>
-      <div><b>Deliver to: </b> {orderDetails.deliverTo}</div>
-      <div><b>Contact: </b> {orderDetails.contact}</div>
-      <div><b>Attendedy By: </b> {orderDetails.attendedBy}</div>
-      { orderDetails.model ? <div><b>Model: </b> {orderDetails.model}</div> : null}
-      { orderDetails.serialNumber ? <div><b>Serial Number: </b> {orderDetails.serialNumber}</div> : null}
+      <button><Link to="/">Go back to index</Link></button>
+      <h1>DO No. {order.doNo}</h1>
+      <button><Link to={`/order/edit/${orderId}`}>Edit</Link></button>
+      <h2>{order.companyName}</h2>
+      <div><b>Status: </b>{order.status}</div>
+      <div><b>Delivery date: </b>{order.date}</div>
+      <div><b>Deliver to: </b> {order.deliverTo}</div>
+      <div><b>Contact: </b> {order.contact}</div>
+      <div><b>Attendedy By: </b> {order.attendedBy}</div>
+      { order.model ? <div><b>Model: </b> {order.model}</div> : null}
+      { order.serialNumber ? <div><b>Serial Number: </b> {order.serialNumber}</div> : null}
       <div>
         <table>
           <thead>
@@ -31,7 +50,7 @@ function ViewOrder(props) {
               <th>Total Price</th>
             </tr>
           </thead>
-          {lineItems.map((item, index) =>
+          {order.items.map((item, index) =>
             <thead key={item.id}>
               <tr>
                 <td>{index + 1}</td>
@@ -46,24 +65,14 @@ function ViewOrder(props) {
       </div>
       <h3 style={{marginBottom: "0px"}}>Signature</h3>
       {
-        orderDetails.status === 'unfulfilled'
+        order.status === 'unfulfilled'
           ? <>
               <Signature sigCanvas={sigCanvas} clearCanvas={clearCanvas}/>
-              <button onClick={() => {
-                markOrderAsFulfilled(orderDetails, lineItems, sigCanvas)
-                setCurrentPage('index')
-              }}
+              <button onClick={markOrderAsFulfilled}
               >Mark as sent</button>
             </>
-          : null
+          : <div><img src={order.signature.img}/></div>
       }
-      <div>
-        {
-          orderDetails.status === 'delivered' || orderDetails.status ===  'invoiced'
-            ? <img src={orderDetails.signature.img}/>
-            : null
-        }
-      </div>
     </>
   )
 }

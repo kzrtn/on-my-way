@@ -1,23 +1,44 @@
-import { useLineItems } from "../utils/useLineItems"
+function InputLineItems({order, setOrder}) {
+  const onChange = ({ target }) => {
+    const {id, field} = target.dataset
 
-function InputLineItems({lineItems, setLineItems}) {
-  const { onAdd, onChange, onDelete } = useLineItems(lineItems, setLineItems)
+    setOrder({
+      ...order,
+      items: order.items.map(item => item.id === id ? { ...item, [field]: target.value } : item)
+    })
+  }
+
+  const addItem = () => {
+    setOrder({
+      ...order,
+      items: order.items.concat({
+        id: crypto.randomUUID(),
+        content: '',
+        qty: '',
+        price: ''
+      })
+    })
+  }
+
+  const onDelete = id => {
+    setOrder(order.items.filter(item => item.id !== id))
+  }
 
   return (
     <>
       <div>
-        {lineItems.map(lineItem => {
+        {order.items.map(item => {
           return (
-            <div key={lineItem.id}>
-              <input value={lineItem.content} data-id={lineItem.id} data-field='content' onChange={onChange} className='lineItem'></input>
-              <input value={lineItem.qty} data-id={lineItem.id} data-field='qty' onChange={onChange} className='lineItemSmall'></input>
-              <input value={lineItem.price} data-id={lineItem.id} data-field='price' onChange={onChange} type='number' className='lineItemSmall'></input>
-              <button onClick={onDelete} id={lineItem.id}>Delete</button>
+            <div key={item.id}>
+              <input value={item.content} data-id={item.id} data-field='content' onChange={onChange} className='lineItem'></input>
+              <input value={item.qty} data-id={item.id} data-field='qty' onChange={onChange} className='lineItemSmall'></input>
+              <input value={item.price} data-id={item.id} data-field='price' type='number' onChange={onChange} className='lineItemSmall'></input>
+              <button onClick={() => onDelete(item.id)}>Delete</button>
             </div>
           )
         })}
       </div>
-      <button onClick={onAdd}>Add line item</button>
+      <button onClick={addItem}>Add line item</button>
     </>
   )
 }

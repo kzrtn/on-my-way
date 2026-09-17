@@ -1,70 +1,34 @@
-import { useState } from 'react'
+import { Routes, Route, useMatch } from 'react-router-dom'
 
 // Pages
-import Index from './pages/Index.jsx'
+import OrderList from './pages/OrderList.jsx'
 import EditOrder from './pages/EditOrder.jsx'
 import ViewOrder from './pages/ViewOrder.jsx'
 
-// Utils
-import handleOrder from './utils/handleOrder.js'
-
-// Data
-import { initialListOfOrders } from './backend/initialListOfOrders.js'
-
 function App() {
-  const [currentPage, setCurrentPage] = useState('index')
-  const [ listOfOrders, setListOfOrders ] = useState(initialListOfOrders)
-  const [ orderDetails, setOrderDetails ] = useState({})
-  const [ lineItems, setLineItems ] = useState([])
-
-  const { loadNewOrder, loadOrder, saveOrder, markOrderAsFulfilled } = handleOrder(setOrderDetails, setLineItems,
-                                                                                      listOfOrders, setListOfOrders)
+  const orderIdMatch = useMatch("/order/:id")
+  const editIdMatch = useMatch("/order/edit/:id")
 
   return (
-    <>
-      {
-        currentPage === 'index'
-        ? <Index
-            listOfOrders={listOfOrders}
-            createNewOrder={() => {
-                loadNewOrder(setOrderDetails, setLineItems, listOfOrders)
-                setCurrentPage('EditOrder')
-              }
-            }
-            loadOrder={e => {
-              loadOrder(e.currentTarget.id)
-              setCurrentPage('ViewOrder')
-            }}
-          />
-        : null
-      }
+    <div>
+      <Routes>
+        <Route path="/" element={
+          <OrderList />
+        }/>
 
-      {
-        currentPage === 'EditOrder'
-        ? <EditOrder
-          saveOrder={saveOrder}
-          orderDetails={orderDetails}
-          setOrderDetails={setOrderDetails}
-          lineItems={lineItems}
-          setLineItems={setLineItems}
-          listOfOrders={listOfOrders}
-          setListOfOrders={setListOfOrders}
-          setCurrentPage={setCurrentPage}
-        />
-        : null
-      }
+        <Route path="order/edit/:id" element={
+          <EditOrder orderId={editIdMatch?.params.id} />
+        }/>
 
-      {
-        currentPage === 'ViewOrder'
-        ? <ViewOrder
-          markOrderAsFulfilled={markOrderAsFulfilled}
-          orderDetails={orderDetails}
-          lineItems={lineItems}
-          setCurrentPage={setCurrentPage}
-        />
-        : null
-      }
-    </>
+        <Route path="order/edit/" element={
+          <EditOrder orderId="" />
+        }/>
+
+        <Route path="order/:id" element={
+          <ViewOrder orderId={orderIdMatch?.params.id} />
+        }/>
+      </Routes>
+    </div>
     
   )
 }
