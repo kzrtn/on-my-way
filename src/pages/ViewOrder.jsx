@@ -33,7 +33,13 @@ function ViewOrder({ orderId }) {
       <button><Link to={`/order/edit/${orderId}`}>Edit</Link></button>
       <h2>{order.companyName}</h2>
       <div><b>Status: </b>{order.status}</div>
-      <div><b>Delivery date: </b>{order.date}</div>
+      { order.status === 'delivered'
+        ? (
+          <div><b>Date Delivered: </b>{order.dateDelivered}</div>
+        ) : (
+          <div><b>Deliver By: </b>{order.deliverBy}</div>
+        )
+      }
       <div><b>Deliver to: </b> {order.deliverTo}</div>
       <div><b>Contact: </b> {order.contact}</div>
       <div><b>Attendedy By: </b> {order.attendedBy}</div>
